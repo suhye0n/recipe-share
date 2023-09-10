@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FaRegHeart, FaHeart, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { db } from '../firebase';
 import {
     collection,
@@ -9,6 +10,7 @@ import {
     addDoc,
     query,
     orderBy,
+    updateDoc,
     serverTimestamp,
     onSnapshot,
     deleteDoc,
@@ -19,12 +21,28 @@ const DetailContainer = styled.div`
     max-width: 800px;
     margin: 0 auto;
     margin-top: -150px;
+    margin-bottom: 70px;
     padding: 20px;
     z-index: 10;
     position: relative;
     border-radius: 10px;
     box-shadow: 1px 1px 1px 1px #FF7895;
     background-color: #fff;
+`;
+
+const LikeButton = styled.button`
+    display: block;
+    margin: 30px auto;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+    transition: background-color 0.4s;
+    * {color: ${props => props.liked ? '#FF7895' : '#eee'};}
+    span {
+        margin-left: -18px;
+        color: #000;
+    }
 `;
 
 const RecipeTitle = styled.h2`
@@ -74,9 +92,9 @@ const CommentForm = styled.form`
 `;
 
 const CommentTextarea = styled.textarea`
-    width: 100%;
+    width: calc(100% - 20px);
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #FF7895;
     border-radius: 5px;
     resize: none;
 `;
@@ -88,7 +106,7 @@ const CommentButton = styled.button`
     border: 1px solid #eee;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #357abD;
+    background-color: #FF7895;
     color: #fff;
 `;
 
@@ -122,9 +140,12 @@ const RecipeDetail = () => {
     const [newComment, setNewComment] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [storedUser, setStoredUser] = useState(null);
+    const [liked, setLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
 
     useEffect(() => {
         const userFromLocalStorage = JSON.parse(localStorage.getItem('user'));
+        console.log(userFromLocalStorage);
         setStoredUser(userFromLocalStorage);
         setIsLoggedIn(!!userFromLocalStorage);
     }, []);
@@ -133,17 +154,21 @@ const RecipeDetail = () => {
         try {
             const recipeDoc = await getDoc(doc(db, 'recipes', id));
             if (recipeDoc.exists()) {
+                const recipeData = recipeDoc.data();
                 setRecipe({
                     id: recipeDoc.id,
-                    ...recipeDoc.data(),
+                    ...recipeData,
                 });
+                
+                setLiked(recipeData.likedBy?.includes(storedUser?.uid) || false);
+                setLikeCount(recipeData.likedBy?.length || 0);
             } else {
                 console.error('레시피를 찾을 수 없음');
             }
         } catch (error) {
             console.error(error);
         }
-    };
+    };    
 
     const fetchComments = () => {
         const commentsQuery = query(
@@ -177,6 +202,18 @@ const RecipeDetail = () => {
         };
     }, [id]);
 
+    const handleDeleteComment = async (commentId) => {
+        try {
+            const userInput = window.prompt("삭제하시려면 예를 입력해주세요.");
+            if (userInput === "예") {
+                await deleteDoc(doc(db, 'comments', commentId));
+                alert('댓글이 삭제되었습니다.');
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
 
@@ -197,47 +234,69 @@ const RecipeDetail = () => {
 
             setNewComment('');
         } catch (error) {
-            console.error('Error adding comment:', error);
+            console.error(error);
         }
     };
 
     const navigate = useNavigate();
 
     const handleEditRecipe = () => {
-        if (storedUser && storedUser.uid === recipe.userUid) {
-            navigate(`/write?id=${recipe.id}`);
-        } else {
-            alert('수정할 권한이 없습니다.');
-        }
+        navigate(`/write?id=${recipe.id}`);
     };
 
     const handleDeleteRecipe = async () => {
-        if (storedUser && storedUser.uid === recipe.userUid) {
-            try {
+        try {
+            const userInput = window.prompt("삭제하시려면 예를 입력해주세요.");
+            if (userInput === "예") {
                 await deleteDoc(doc(db, 'recipes', recipe.id));
                 alert('성공적으로 삭제되었습니다.');
                 navigate('/');
-            } catch (error) {
-                console.error(error);
             }
-        } else {
-            alert('삭제할 권한이 없습니다.');
+        } catch (error) {
+            console.error(error);
         }
     };
 
-    const canEditOrDelete = storedUser && storedUser.uid === recipe?.userUid && storedUser.nickname === recipe?.user;
+    const handleLike = async () => {
+        if (!isLoggedIn || !recipe) {
+            return;
+        }
+    
+        if (!storedUser || !storedUser.nickname) {
+            return;
+        }
+    
+        try {
+            const recipeDocRef = doc(db, 'recipes', recipe.id);
+            let updatedLikedBy = recipe.likedBy || [];
+    
+            if (liked) {
+                updatedLikedBy = updatedLikedBy.filter(nickname => nickname !== storedUser.nickname);
+            } else {
+                if (!updatedLikedBy.includes(storedUser.nickname)) {
+                    updatedLikedBy.push(storedUser.nickname);
+                }
+            }
+    
+            await updateDoc(recipeDocRef, {
+                likedBy: updatedLikedBy,
+            });
+    
+            setLiked(!liked);
+            setLikeCount(updatedLikedBy.length);
+    
+        } catch (error) {
+            console.error(error);
+        }
+    };    
+    
+    const canEditOrDelete = storedUser?.nickname === recipe?.user;
 
     return (
         <DetailContainer>
             {recipe ? (
                 <div>
                     <RecipeTitle>{recipe.title}</RecipeTitle>
-                    {isLoggedIn && canEditOrDelete && (
-                        <EditButtons>
-                            <EditButton onClick={handleEditRecipe}>수정</EditButton>
-                            <DeleteButton onClick={handleDeleteRecipe}>삭제</DeleteButton>
-                        </EditButtons>
-                    )}
                     <RecipeInfo>
                         <InfoLabel>작성자:</InfoLabel> {recipe.user}
                     </RecipeInfo>
@@ -251,19 +310,42 @@ const RecipeDetail = () => {
                         <InfoLabel>단계:</InfoLabel> {recipe.steps}
                     </RecipeInfo>
                     <RecipeImage src={recipe.imageURL} alt={recipe.title} />
+                    <LikeButton 
+                        onClick={handleLike} 
+                        liked={liked}
+                    >
+                        {liked ? <FaHeart /> : <FaRegHeart />}
+                        <span>{likeCount}</span>
+                    </LikeButton>
+                    {isLoggedIn && canEditOrDelete && (
+                        <EditButtons>
+                            <EditButton onClick={handleEditRecipe}>
+                                <FaEdit /> 수정
+                            </EditButton>
+                            <DeleteButton onClick={handleDeleteRecipe}>
+                                <FaTrashAlt /> 삭제
+                            </DeleteButton>
+                        </EditButtons>
+                    )}
                 </div>
             ) : (
                 <p>해당하는 글이 없습니다.</p>
             )}
 
             <CommentSection>
-                <h3>Comments</h3>
+                <h3>댓글</h3>
                 <CommentList>
                     {comments.map((comment) => (
                         <CommentItem key={comment.id}>
                             <CommentText>
-                                {comment.user}: {comment.text}
+                                {comment.user}: {comment.text} <br/>
+                                {comment.timestamp?.toDate().toLocaleString()}
                             </CommentText>
+                            {storedUser?.nickname === comment.user && (
+                                <DeleteButton onClick={() => handleDeleteComment(comment.id)}>
+                                    <FaTrashAlt /> 삭제
+                                </DeleteButton>
+                            )}
                         </CommentItem>
                     ))}
                 </CommentList>

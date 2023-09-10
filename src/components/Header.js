@@ -52,11 +52,15 @@ const Sidebar = styled.div`
 `;
 
 const Category = styled.h1`
-  display: block;
   font-size: 1.5rem;
 
   * {
     color: #f9f9f9 !important;
+  }
+
+  a {
+    display: block;
+    margin: 30px 0;
   }
 `;
 
@@ -142,6 +146,7 @@ const SearchButton = styled(Link)`
   margin-top: 20px;
   font-weight: bold;
   background: #FF7895;
+  z-index: 20;
   
   * {
     color: #fff;
@@ -167,6 +172,24 @@ const SearchIcon = styled(FiSearch)`
 `;
 
 const MyPageLink = styled(Link)`
+  text-decoration: none;
+  font-size: 1rem;
+  margin-left: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    text-decoration: underline;
+  }
+  
+  * {
+    color: #f9f9f9 !important;
+    margin-left: 13px;
+  }
+`;
+
+const Member = styled.div`
   text-decoration: none;
   font-size: 1rem;
   margin-left: 20px;
@@ -267,6 +290,10 @@ const Header = () => {
             <Sidebar show={showSidebar}>
                 <Category>
                     <Link to="/"><FaUtensils color="#f9f9f9" /> 홈</Link>
+                    <Link to="/?category=한식"><FaUtensils color="#f9f9f9" /> 한식</Link>
+                    <Link to="/?category=중식"><FaUtensils color="#f9f9f9" /> 중식</Link>
+                    <Link to="/?category=일식"><FaUtensils color="#f9f9f9" /> 일식</Link>
+                    <Link to="/?category=양식"><FaUtensils color="#f9f9f9" /> 양식</Link>
                 </Category>
                 <CloseIcon onClick={toggleSidebar} />
             </Sidebar>
@@ -296,11 +323,11 @@ const Header = () => {
                         </LogoutIcon>
                     </MyPageLink>
                 ) : (
-                    <MyPageLink to="/signup">
-                        <MdCardMembership size={24} />
+                    <Member>
+                        <MdCardMembership size={24} onClick={() => navigate('/signup')} />
                         <LoginIcon onClick={() => navigate('/login')}>
                         </LoginIcon>
-                    </MyPageLink>
+                    </Member>
                 )}
             </HeaderContainer>
             <SearchModal show={showModal}>

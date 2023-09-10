@@ -3,21 +3,30 @@ import styled from 'styled-components';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { addDoc, collection, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const storage = getStorage();
 
 const Container = styled.div`
-width: 80%;
-max-width: 800px;
-margin: 0 auto;
-margin-top: -150px;
-padding: 50px 20px;
-z-index: 10;
-position: relative;
-border-radius: 10px;
-box-shadow: 1px 1px 1px 1px #FF7895;
-background-color: #fff;
+  width: 80%;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: -150px;
+  padding: 50px 20px;
+  z-index: 10;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 1px 1px 1px 1px #FF7895;
+  background-color: #fff;
+`;
+
+const Select = styled.select`
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
+  width: calc(80% + 20px);
+  border: 1px solid #ff7895;
+  border-radius: 5px;
 `;
 
 const Form = styled.form`
@@ -65,10 +74,12 @@ const FileInput = styled.input`
 `;
 
 const RecipeUpload = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const id = new URLSearchParams(location.search).get('id');
   const storedUser = JSON.parse(localStorage.getItem('user'));
   const nickname = storedUser ? storedUser.nickname : 'Anonymous';
+  
   const [formData, setFormData] = useState({
     user: nickname,
     title: '',
@@ -76,6 +87,7 @@ const RecipeUpload = () => {
     ingredients: '',
     steps: '',
     image: null,
+    category: '',
   });
 
   useEffect(() => {
@@ -130,32 +142,36 @@ const RecipeUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const uploadedImageURL = await uploadImage();
-
+  
+      const newRecipeData = {
+        user: nickname,
+        title: formData.title,
+        description: formData.description,
+        ingredients: formData.ingredients,
+        steps: formData.steps,
+        imageURL: uploadedImageURL,
+        category: formData.category,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+  
       if (id) {
         const recipeDocRef = doc(db, 'recipes', id);
         await updateDoc(recipeDocRef, {
-          title: formData.title,
-          description: formData.description,
-          ingredients: formData.ingredients,
-          steps: formData.steps,
-          imageURL: uploadedImageURL,
+          ...newRecipeData,
+          updatedAt: new Date()
         });
         alert('레시피가 수정되었습니다.');
+        navigate('/');
       } else {
-        await addDoc(collection(db, 'recipes'), {
-          user: nickname,
-          title: formData.title,
-          description: formData.description,
-          ingredients: formData.ingredients,
-          steps: formData.steps,
-          imageURL: uploadedImageURL,
-        });
+        await addDoc(collection(db, 'recipes'), newRecipeData);
         alert('레시피가 등록되었습니다.');
+        navigate('/');
       }
-
+  
       setFormData({
         user: nickname,
         title: '',
@@ -163,11 +179,20 @@ const RecipeUpload = () => {
         ingredients: '',
         steps: '',
         image: null,
+        category: '',
       });
     } catch (error) {
       console.error(error);
     }
-  };
+  };  
+
+  if (nickname === 'Anonymous') {
+    return (
+      <Container>
+        <p>글을 쓰려면 로그인이 필요합니다.</p>
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -179,6 +204,17 @@ const RecipeUpload = () => {
           value={formData.title}
           onChange={handleInputChange}
         />
+        <Select
+          name="category"
+          value={formData.category}
+          onChange={handleInputChange}
+        >
+          <option value="" disabled>-- 카테고리 선택 --</option>
+          <option value="한식">한식</option>
+          <option value="중식">중식</option>
+          <option value="일식">일식</option>
+          <option value="양식">양식</option>
+        </Select>
         <TextArea
           name="description"
           placeholder="설명"

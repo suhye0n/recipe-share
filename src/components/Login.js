@@ -25,6 +25,7 @@ const Container = styled.div`
 const Title = styled.h1`
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: #ff7895;
 `;
 
 const Input = styled.input`
@@ -80,11 +81,14 @@ const Login = () => {
       const querySnapshot = await getDocs(q);
 
       let nickname = '';
+      let uid = '';
       querySnapshot.forEach((doc) => {
         nickname = doc.data().nickname;
+        uid = doc.data().uid;
       });
+      
 
-      localStorage.setItem('user', JSON.stringify({ nickname: nickname }));
+      localStorage.setItem('user', JSON.stringify({ nickname: nickname, uid: uid }));
 
       alert('로그인이 완료되었습니다.');
       navigate('/');

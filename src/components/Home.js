@@ -77,65 +77,13 @@ const Home = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [commentCounts, setCommentCounts] = useState({});
     const location = useLocation();
-    const [searchTerm, setSearchTerm] = useState('');
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
-    const [showSidebar, setShowSidebar] = useState(false);
-    const [scroll, setScroll] = useState(false);
-
-    let lastScrollY = 0;
-    let ticking = false;
-
-    const update = () => {
-        setScroll(window.scrollY > 300);
-        ticking = false;
-    };
-
-    const requestTick = () => {
-        if (!ticking) {
-            requestAnimationFrame(update);
-        }
-        ticking = true;
-    };
-
-    useEffect(() => {
-        const onScroll = () => {
-            lastScrollY = window.scrollY;
-            requestTick();
-        };
-
-        window.addEventListener('scroll', onScroll);
-        return () => {
-            window.removeEventListener('scroll', onScroll);
-        };
-    }, []);
-
-    const toggleSidebar = () => {
-        setShowSidebar(!showSidebar);
-    };
 
     useEffect(() => {
         const user = localStorage.getItem('user');
         setIsLoggedIn(!!user);
     }, []);
-
-    const handleSearchInputChange = (e) => {
-        setSearchTerm(e.target.value);
-    };
-
-    const handleSearchSubmit = (e) => {
-        e.preventDefault();
-        if (searchTerm.trim() === '') {
-            return;
-        }
-        navigate(`/?search=${searchTerm}`);
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        setIsLoggedIn(false);
-        alert('로그아웃이 완료되었습니다.');
-    };
 
     const fetchRecipes = async () => {
         try {
@@ -161,10 +109,11 @@ const Home = () => {
     }, []);
 
     const searchQuery = new URLSearchParams(location.search).get('search') || '';
-
-    const filterRecipes = (recipes, query) => {
+    const category = new URLSearchParams(location.search).get('category') || '';
+    
+    const filterRecipes = (recipes, query, category) => {
         return recipes.filter((recipe) =>
-            recipe.title.toLowerCase().includes(query.toLowerCase())
+          recipe.title.toLowerCase().includes(query.toLowerCase()) && (!category || recipe.category === category)
         );
     };
 
@@ -216,7 +165,7 @@ const Home = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filterRecipes(recipes, searchQuery).map((recipe) => (
+                                {filterRecipes(recipes, searchQuery, category).map((recipe) => (
                                     <TableRow key={recipe.id}>
                                         <TableCell>
                                             <TitleLink to={`view?id=${recipe.id}`}>
