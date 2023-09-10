@@ -11,22 +11,29 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import styled from 'styled-components';
-import { FaUtensils } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Container = styled.div`
-  background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  width: 80%;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: -150px;
+  padding: 20px;
+  z-index: 10;
+  position: relative;
+  border-radius: 10px;
+  box-shadow: 1px 1px 1px 1px #FF7895;
+  background-color: #fff;
 `;
 
 const Title = styled.h1`
   font-size: 2.5em;
   margin-bottom: 20px;
-  color: #4a90e2;
+  color: #ff7895;
 `;
 
 const Input = styled.input`
@@ -38,16 +45,17 @@ const Input = styled.input`
 `;
 
 const Button = styled.button`
-  padding: 14px 20px;
-  margin: 14px 0;
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover {
-    background-color: #357abD;
-  }
+padding: 0.5rem 1rem;
+font-size: 1rem;
+background-color: #ff7895;
+color: white;
+border: none;
+border-radius: 0.3rem;
+transition: 0.4s;
+cursor: pointer;
+&:hover {
+  opacity: 0.7;
+}
 `;
 
 const ErrorMsg = styled.p`
@@ -61,12 +69,13 @@ const AlreadyMember = styled.p`
 `;
 
 const StyledLink = styled(Link)`
-  font-weight: 600;
-  text-decoration: underline;
-  color: #4a90e2;
-  &:hover {
-    color: #357abd;
-  }
+font-weight: 600;
+text-decoration: underline;
+color: #ff7895 !important;
+transition: 0.4s;
+&:hover {
+  opacity: 0.7;
+}
 `;
 
 const Signup = () => {
@@ -109,7 +118,6 @@ const Signup = () => {
 
   return (
     <Container>
-      <FaUtensils size="4em" color="#4a90e2" />
       <Title>회원가입</Title>
       <Input
         type="text"

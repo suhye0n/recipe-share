@@ -15,96 +15,103 @@ import {
 } from 'firebase/firestore';
 
 const DetailContainer = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+    width: 80%;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: -150px;
+    padding: 20px;
+    z-index: 10;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px 1px #FF7895;
+    background-color: #fff;
 `;
 
 const RecipeTitle = styled.h2`
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
 `;
 
 const RecipeInfo = styled.div`
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 `;
 
 const InfoLabel = styled.span`
-  font-weight: bold;
-  margin-right: 5px;
+    font-weight: bold;
+    margin-right: 5px;
 `;
 
 const RecipeImage = styled.img`
-  max-width: 100%;
-  height: auto;
-  margin-top: 20px;
-  border-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 `;
 
 const CommentSection = styled.div`
-  margin-top: 20px;
+    margin-top: 20px;
 `;
 
 const CommentList = styled.ul`
-  list-style: none;
-  padding: 0;
+    list-style: none;
+    padding: 0;
 `;
 
 const CommentItem = styled.li`
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 const CommentText = styled.p`
-  margin: 0;
+    margin: 0;
 `;
 
 const CommentForm = styled.form`
-  margin-top: 20px;
+    margin-top: 20px;
 `;
 
 const CommentTextarea = styled.textarea`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  resize: none;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none;
 `;
 
 const CommentButton = styled.button`
-  display: block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  cursor: pointer;
-  background-color: #357abD;
-  color: #fff;
+    display: block;
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #357abD;
+    color: #fff;
 `;
 
 const EditButtons = styled.div`
-  display: flex;
-  align-items: center;
+    display: flex;
+    align-items: center;
 `;
 
 const EditButton = styled.button`
     border: 1px solid #eee;
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-right: 10px;
-  cursor: pointer;
-  background-color: transparent;
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+    background-color: transparent;
 `;
 
 const DeleteButton = styled.button`
-  border: 1px solid #eee;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  background-color: transparent;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    background-color: transparent;
 `;
 
 const RecipeDetail = () => {

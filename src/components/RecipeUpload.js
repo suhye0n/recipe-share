@@ -8,9 +8,16 @@ import { useLocation } from 'react-router-dom';
 const storage = getStorage();
 
 const Container = styled.div`
+width: 80%;
 max-width: 800px;
 margin: 0 auto;
-padding: 20px;
+margin-top: -150px;
+padding: 50px 20px;
+z-index: 10;
+position: relative;
+border-radius: 10px;
+box-shadow: 1px 1px 1px 1px #FF7895;
+background-color: #fff;
 `;
 
 const Form = styled.form`
@@ -24,7 +31,7 @@ const Input = styled.input`
   padding: 0.5rem;
   font-size: 1rem;
   width: 80%;
-  border: 1px solid #eee;
+  border: 1px solid #ff7895;
   border-radius: 5px;
 `;
 
@@ -34,7 +41,7 @@ const TextArea = styled.textarea`
   font-size: 1rem;
   width: 80%;
   height: 100px;
-  border: 1px solid #eee;
+  border: 1px solid #ff7895;
   border-radius: 5px;
   resize: none;
 `;
@@ -42,13 +49,14 @@ const TextArea = styled.textarea`
 const Button = styled.button`
   padding: 0.5rem 1rem;
   font-size: 1rem;
-  background-color: #357abD;
+  background-color: #ff7895;
   color: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #ff7895;
   border-radius: 5px;
   cursor: pointer;
 
   &:hover {
+    opacity: 0.7;
   }
 `;
 
