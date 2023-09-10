@@ -21,3 +21,5 @@
 3. **댓글 기능**
     - 사용자는 특정 레시피 페이지에서 댓글을 작성할 수 있습니다.
     - 댓글은 실시간으로 업데이트됩니다.
+
+![image](https://github.com/suhye0n/recipe-share-platform/assets/63187994/9445c9f2-0c6f-40ec-bf47-3b07f7a71753)
